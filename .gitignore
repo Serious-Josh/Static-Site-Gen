@@ -1,1 +1,5 @@
+#vscode files
 *.code-workspace
+
+#python files/folders
+__pycache__/
