@@ -11,7 +11,7 @@ class HTMLNode():
         raise NotImplementedError
     
     def props_to_html(self):
-        if len(self.props) == 0 or self.props is None:
+        if len(self.props) == 0 or self.props is None: # type: ignore
             return ""
         
         string = " "

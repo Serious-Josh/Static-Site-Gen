@@ -1,5 +1,13 @@
 import re
 from textnode import TextType, TextNode
+from block import markdown_to_blocks
+
+def markdown_to_html_node(markdown):
+     #breaking down markdown doc into blocks
+     blocks = markdown_to_blocks(markdown)
+
+     for block in blocks:
+          pass
 
 def text_to_textnodes(text):
     node = TextNode(text, TextType.TEXT,)

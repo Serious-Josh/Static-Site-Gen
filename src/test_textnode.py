@@ -1,5 +1,6 @@
 import unittest
 from functions import *
+from block import markdown_to_blocks
 from textnode import TextNode, TextType, text_node_to_html_node
 
 class TestTextNode(unittest.TestCase):
