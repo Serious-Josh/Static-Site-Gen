@@ -1,13 +1,68 @@
 import re
-from textnode import TextType, TextNode
-from block import markdown_to_blocks
+from textnode import *
+from block import markdown_to_blocks, block_to_block_type, BlockType
 
 def markdown_to_html_node(markdown):
-     #breaking down markdown doc into blocks
-     blocks = markdown_to_blocks(markdown)
+    #breaking down markdown doc into blocks
+    blocks = markdown_to_blocks(markdown)
+    html_nodes = []
 
-     for block in blocks:
-          pass
+    for block in blocks:
+        type = block_to_block_type(block)
+
+        match(type):
+            case BlockType.PARAGRAPH:
+                text = " ".join(block.split("\n"))
+                children = text_to_children(text)
+                html_nodes.append(ParentNode("p", children))
+            case BlockType.HEADING:
+                count = len(block) - len(block.lstrip("#"))
+                text = block[count + 1:]
+                children = text_to_children(text)
+                html_nodes.append(ParentNode(f"h{count}", children))
+            case BlockType.CODE:
+                text = block[4:-3]
+                node = TextNode(text, TextType.TEXT)
+                child = text_node_to_html_node(node)
+                code = ParentNode("code", [child])
+                html_nodes.append(ParentNode("pre", [code]))
+            case BlockType.QUOTE:
+                splits = block.split("\n")
+                new_string = []
+                for line in splits:
+                    if line.startswith("> "):
+                        new_string.append(line[2:])
+                    else:
+                        new_string.append(line[1:])
+                
+                text = " ".join(new_string)
+                children = text_to_children(text)
+                html_nodes.append(ParentNode("blockquote", children))
+            case BlockType.UN_LIST:
+                items = [line[2:] for line in block.split("\n")]
+                list_items = []
+
+                for item in items:
+                    text = text_to_children(item)
+                    list_items.append(ParentNode("li", text))
+                html_nodes.append(ParentNode("ul", list_items))
+            case BlockType.OR_LIST:
+                items = [line.split(". ", 1)[1] for line in block.split("\n")]
+                list_items = []
+
+                for item in items:
+                    text = text_to_children(item)
+                    list_items.append(ParentNode("li", text))
+                html_nodes.append(ParentNode("ol", list_items))
+
+    return ParentNode("div", html_nodes)
+
+def text_to_children(text):
+     nodes = text_to_textnodes(text)
+     html_nodes = []
+     for node in nodes:
+          html_nodes.append(text_node_to_html_node(node))
+     return html_nodes
 
 def text_to_textnodes(text):
     node = TextNode(text, TextType.TEXT,)

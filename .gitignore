@@ -3,3 +3,6 @@
 
 #python files/folders
 __pycache__/
+
+#working files/folders
+public/
