@@ -1,5 +1,6 @@
 import shutil
 import os
+from functions import generate_pages_recursive
 
 
 def copy_static(src, dest):
@@ -26,6 +27,7 @@ def main():
 
     copy_static(src, dest)
 
+    generate_pages_recursive("content/", "template.html", "public/")
 
 if __name__ == "__main__":
     main()

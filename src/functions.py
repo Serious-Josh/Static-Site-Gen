@@ -1,6 +1,8 @@
 import re
+import os
 from textnode import *
 from block import markdown_to_blocks, block_to_block_type, BlockType
+from pathlib import Path
 
 def markdown_to_html_node(markdown):
     #breaking down markdown doc into blocks
@@ -92,10 +94,9 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
             if split != "":
                 if count % 2 == 1:
                         new_nodes.append(TextNode(split, TextType.TEXT))
-                        count += 1
                 else:
                         new_nodes.append(TextNode(split, text_type))
-                        count += 1 
+            count += 1
 
     return new_nodes
 
@@ -165,8 +166,45 @@ def split_nodes_link(old_nodes):
 
     return new_nodes
 
+def extract_title(markdown):
+    for line in markdown.split("\n"):
+        if line.startswith("# "):
+             return line[2:]
+    raise Exception("extract_title: no title found")
+
 def extract_markdown_images(text):
       return re.findall(r"!\[(.*?)\]\((.*?)\)", text)
 
 def extract_markdown_links(text):
       return re.findall(r"(?<!!)\[(.*?)\]\((.*?)\)", text)
+
+def generate_page(from_path, template_path, dest_path):
+    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
+
+    from_f = open(from_path)
+    template_f = open(template_path)
+
+    os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+    dest_f = open(dest_path, "w")
+
+    markdown = from_f.read()
+    from_f.close()
+
+    template = template_f.read()
+    template_f.close()
+
+    nodes = markdown_to_html_node(markdown)
+    html = nodes.to_html()
+    title = extract_title(markdown)
+    template = template.replace("{{ Title }}", title)
+    template = template.replace("{{ Content }}", html)
+    dest_f.write(template)
+    dest_f.close()
+
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    for entry in os.listdir(dir_path_content):
+        full_path = os.path.join(dir_path_content, entry)
+        if os.path.isfile(full_path):
+            generate_page(full_path, template_path, Path(os.path.join(dest_dir_path, entry)).with_suffix(".html"))
+        else:
+            generate_pages_recursive(full_path, template_path, os.path.join(dest_dir_path, entry))

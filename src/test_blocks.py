@@ -1,7 +1,7 @@
 import unittest
 from block import markdown_to_blocks, block_to_block_type, BlockType
 
-class TestTextNode(unittest.TestCase):
+class TestBlocks(unittest.TestCase):
     def test_markdown_to_blocks(self):
         md = """
 This is **bolded** paragraph
