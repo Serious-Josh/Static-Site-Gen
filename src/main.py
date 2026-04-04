@@ -1,5 +1,6 @@
 import shutil
 import os
+import sys
 from functions import generate_pages_recursive
 
 
@@ -18,6 +19,8 @@ def copy_static(src, dest):
     
 
 def main():
+    basepath = sys.argv[0] or "/"
+
     #clean public folder
     src = "static"
     dest = 'public'
@@ -27,7 +30,7 @@ def main():
 
     copy_static(src, dest)
 
-    generate_pages_recursive("content/", "template.html", "public/")
+    generate_pages_recursive("content/", "template.html", "docs/", basepath)
 
 if __name__ == "__main__":
     main()
